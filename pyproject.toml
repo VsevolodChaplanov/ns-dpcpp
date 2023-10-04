@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "ns-dpcpp"
+version = "0.1.0"
+description = "PhD thesis on the topic: \"High-performance finite element methodology for calculating turbulent flows using locally structured meshes\", using heterogeneous computing based on the SYCL standard and its implementation from Intel - Data Parallel C++ within the OneAPI standard."
+authors = ["VsevolodChaplanov <woornad@gmail.com>"]
+license = "CC-BY-4.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+conan = "^2.0.13"
+cmakelang = "^0.6.13"
+pre-commit = "^3.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
