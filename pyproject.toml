@@ -13,6 +13,9 @@ cmakelang = "^0.6.13"
 pre-commit = "^3.4.0"
 
 
+[tool.poetry.group.dev.dependencies]
+pyyaml = "^6.0.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
