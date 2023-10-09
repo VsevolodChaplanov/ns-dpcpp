@@ -4,22 +4,20 @@
 # ghcr.io/intel/llvm/sycl_ubuntu2204_nightly: contains the latest successfully built nightly build of DPC++ compiler. The image comes in three flavors: with pre-installed Intel drivers (latest), without them (no-drivers) and with development kits installed (build).
 
 ARG DOCKER_IMAGE_VARIANT="ghcr.io/intel/llvm/ubuntu2204_build"
-ARG SYCL_WORKSPACE="/workspaces/ns-dpcpp/"
-ARG DPCPP_HOME=${SYCK_WORKSPACE}
-ARG LLVM_BUILD_PARALLEL=8
+ARG DPCPP_HOME="/home/sycl/"
+ARG LLVM_BUILD_PARALLEL=14
 ARG SYCL_BACKEND="--cuda"
 
 FROM ${DOCKER_IMAGE_VARIANT}
 
-ARG SYCL_WORKSPACE
 ARG DPCPP_HOME
 ARG LLVM_BUILD_PARALLEL
 ARG SYCL_BACKEND
 ARG CMAKE_URL="https://apt.kitware.com/ubuntu/"
-ARG CMAKE_PKG=${VARIANT}
+ARG CMAKE_PKG="jammy"
 
 # Install necessary packages available from standard repos
-RUN apt-get update -y -qq && apt-get upgrade -y
+RUN apt-get update -y -qq && apt-get upgrade -y && apt-get install software-properties-common -y
 RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null \
         | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null && \
     apt-add-repository -y "deb ${CMAKE_URL} ${CMAKE_PKG} main" && \
@@ -42,23 +40,24 @@ ENV CONAN_SYSREQUIRES_SUDO 0
 # leaving this flag undefined can cause some installation failures.
 ENV CONAN_SYSREQUIRES_MODE enabled
 
-WORKDIR ${DPCPP_HOME}
+RUN git clone https://github.com/intel/llvm -b sycl ${DPCPP_HOME}/llvm/
 
-RUN git clone https://github.com/intel/llvm -b sycl
-
-RUN python3 ${DPCPP_HOME}/llvm/buildbot/configure.py ${SYCL_BACKEND}
+RUN python3 ${DPCPP_HOME}/llvm/buildbot/configure.py ${SYCL_BACKEND} --llvm-external-projects="clang-tools-extra" --enable-all-llvm-targets
 RUN python3 ${DPCPP_HOME}/llvm/buildbot/compile.py -j ${LLVM_BUILD_PARALLEL}
 
-RUN export PATH=$DPCPP_HOME/llvm/build/bin:$PATH
-RUN export LD_LIBRARY_PATH=$DPCPP_HOME/llvm/build/lib:$LD_LIBRARY_PATH
+RUN echo "export PATH=$DPCPP_HOME/llvm/build/bin:$PATH" > ~/.bashrc
+RUN echo "export LD_LIBRARY_PATH=$DPCPP_HOME/llvm/build/lib:$LD_LIBRARY_PATH" > ~/.bashrc
 
-# # Set the default clang-tidy, so CMake can find it
-RUN update-alternatives --install /usr/bin/clang clang ${DPCPP_HOME}/llvm/build/bin/clang 100
-RUN update-alternatives --install /usr/bin/clang++ clang++ ${DPCPP_HOME}/llvm/build/bin/clang++ 100
-RUN update-alternatives --install /usr/bin/cc cc ${DPCPP_HOME}/llvm/build/bin/clang 100
-RUN update-alternatives --set cc ${DPCPP_HOME}/llvm/build/bin/clang
-RUN update-alternatives --install /usr/bin/c++ c++ ${DPCPP_HOME}/llvm/build/bin/clang++ 100
-RUN update-alternatives --set c++ ${DPCPP_HOME}/llvm/build/bin/clang++
+ENV PATH="${DPCPP_HOME}/llvm/build/bin:$PATH"
+ENV LD_LIBRARY_PATH="${DPCPP_HOME}/llvm/build/lib:$LD_LIBRARY_PATH"
+
+# switch to clang as default alternative for cc and c++
+# RUN update-alternatives --install /usr/bin/clang clang ${DPCPP_HOME}/llvm/build/bin/clang 100
+# RUN update-alternatives --install /usr/bin/clang++ clang++ ${DPCPP_HOME}/llvm/build/bin/clang++ 100
+# RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
+# RUN update-alternatives --set cc /usr/bin/clang
+# RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
+# RUN update-alternatives --set c++ /usr/bin/clang++
 
 # RUN update-alternatives --install /usr/bin/clang-tidy clang-tidy ${DPCPP_HOME}/llvm/clang-tidy 1
 
