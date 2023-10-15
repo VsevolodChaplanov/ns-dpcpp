@@ -1,49 +1,35 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.205.2/containers/cpp
 {
-	"name": "C++",
+	"name": "ns-dpcpp",
 	"build": {
-		"dockerfile": "Dockerfile",
-		// ghcr.io/intel/llvm/ubuntu2204_base: contains basic environment setup for building DPC++ compiler from source.
-		// ghcr.io/intel/llvm/ubuntu2204_intel_drivers: contains everything from the base container + pre-installed Intel drivers.
-		// ghcr.io/intel/llvm/ubuntu2204_build: has development kits installed for NVidia/AMD and can be used for building DPC++ compiler from source with all backends enabled or for end-to-end testing with HIP/CUDA on machines with corresponding GPUs available.
-		// ghcr.io/intel/llvm/sycl_ubuntu2204_nightly: contains the latest successfully built nightly build of DPC++ compiler. The image comes in three flavors: with pre-installed Intel drivers (latest), without them (no-drivers) and with development kits installed (build).
-		"args": {
-			"DOCKER_IMAGE_VARIANT": "ghcr.io/intel/llvm/ubuntu2204_build",
-			"LLVM_BUILD_PARALLEL": "14",
-			"SYCL_BACKEND": "--cuda",
-		},
+		"dockerfile": "Dockerfile.OneAPI"
 	},
 	"runArgs": [
 		"--runtime=nvidia",
 		"--gpus=all",
-		"--cap-add=SYS_PTRACE",
+		"--cap-aDEBIAN_FRONTEND=noninteractivedd=SYS_PTRACE",
 		"--security-opt",
-		"seccomp=unconfined",
+		"seccomp=unconfined"
 	],
-	// Set *default* container specific settings.json values on container create.
-	"settings": {
-		"cmake.configureOnOpen": true,
-		"editor.formatOnSave": true,
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"llvm-vs-code-extensions.vscode-clangd",
+				"ms-vscode.cmake-tools",
+				"twxs.cmake",
+				"vadimcn.vscode-lldb",
+				"xaver.clang-format",
+				"cheshirekow.cmake-format"
+			]
+		},
+		"settings": {
+			"editor.formatOnSave": true
+		}
 	},
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"llvm-vs-code-extensions.vscode-clangd",
-		"ms-vscode.cmake-tools",
-		"twxs.cmake",
-		"vadimcn.vscode-lldb",
-	],
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	// Use 'postCreateCommand' to run commands after the container is created.
-	//"postCreateCommand": "uname -a",
-	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	//"remoteUser": "vscode",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/home/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=delegated",
 	"workspaceFolder": "/home/workspaces/${localWorkspaceFolderBasename}",
 	"features": {
-		"git": "latest",
-		"git-lfs": "latest",
-		"powershell": "latest",
-	},
+		"ghcr.io/devcontainers/features/git:1": {}
+	}
 }
