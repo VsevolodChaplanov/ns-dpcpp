@@ -28,13 +28,16 @@ function(nsdpcpp_setup_dependencies)
     #   cpmaddpackage("gh:catchorg/Catch2@3.3.2")
     # endif()
 
-    # if (NOT TARGET boost::boost)
-    #     cpmaddpackage(
-    #         Name Boost
-    #         VERSION 1.82.0
-    #         GITHUB_REPOSITORY "boostorg/boost"
-    #         GIT_TAG "boost-1.82.0"
-    #     )
-    # endif()
+    if(NOT TARGET boost::boost)
+        cpmaddpackage(
+            Name
+            Boost
+            VERSION
+            1.82.0
+            GITHUB_REPOSITORY
+            "boostorg/boost"
+            GIT_TAG
+            "boost-1.82.0")
+    endif()
 
 endfunction()

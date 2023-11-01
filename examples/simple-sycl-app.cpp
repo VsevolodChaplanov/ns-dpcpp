@@ -29,6 +29,7 @@ int main()
   // Check the results
   bool MismatchFound = false;
   for (size_t I = 0; I < Buffer.size(); ++I) {
+    std::cout << HostAccessor[I] << '\n';
     if (HostAccessor[I] != I) {
       std::cout << "The result is incorrect for element: " << I << " , expected: " << I << " , got: " << HostAccessor[I]
                 << std::endl;

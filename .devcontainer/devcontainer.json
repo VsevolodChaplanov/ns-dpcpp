@@ -8,7 +8,7 @@
 	"runArgs": [
 		"--runtime=nvidia",
 		"--gpus=all",
-		"--cap-aDEBIAN_FRONTEND=noninteractivedd=SYS_PTRACE",
+		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined"
 	],
